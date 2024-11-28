@@ -1,15 +1,8 @@
-import Link from 'next/link';
-import {
-  Home,
-  LineChart,
-  Package,
-  Package2,
-  PanelLeft,
-  Settings,
-  ShoppingCart,
-  Users2
-} from 'lucide-react';
+'use client'
 
+import { Toaster } from 'react-hot-toast';
+import Link from 'next/link';
+import { Package, PanelLeft } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,17 +13,44 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from '@/components/ui/tooltip';
 import { Analytics } from '@vercel/analytics/react';
-import { User } from './user';
-import { VercelLogo } from '@/components/icons';
 import Providers from './providers';
 import { NavItem } from './nav-item';
 import { SearchInput } from './search';
+import { WagmiConfig } from 'wagmi';
+import {
+  mainnet,
+  sepolia,
+  arbitrum,
+  baseSepolia,
+  arbitrumSepolia,
+  Chain
+} from 'wagmi/chains';
+import {createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
+import ConnectButton from '@/components/ui/ConnectButton'
+
+const projectId = '474ca359092dc34eded94e781bdf7822';
+
+const metadata = {
+  name: 'My Celo App',
+  description: 'My Website description',
+  url: 'https://mywebsite.com',
+  icons: ['https://avatars.mywebsite.com/']
+};
+
+const chains: readonly [Chain, ...Chain[]] = [
+  mainnet,
+  sepolia,
+  arbitrum,
+  baseSepolia,
+  arbitrumSepolia
+];
+const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
+
+createWeb3Modal({
+  wagmiConfig,
+  projectId
+});
 
 export default function DashboardLayout({
   children
@@ -39,21 +59,27 @@ export default function DashboardLayout({
 }) {
   return (
     <Providers>
-      <main className="flex min-h-screen w-full flex-col bg-muted/40">
-        <DesktopNav />
-        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-            <MobileNav />
-            <DashboardBreadcrumb />
-            <SearchInput />
-            <User />
-          </header>
-          <main className="grid flex-1 items-start gap-2 p-4 sm:px-6 sm:py-0 md:gap-4 bg-muted/40">
-            {children}
-          </main>
-        </div>
-        <Analytics />
-      </main>
+      <WagmiConfig config={wagmiConfig}>
+        <Toaster />
+        <main className="flex min-h-screen w-full flex-col bg-muted/40">
+          <DesktopNav />
+          <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+              <MobileNav />
+              <DashboardBreadcrumb />
+              <SearchInput />
+              <div className="relative ml-auto flex-1 md:grow-0">
+                <ConnectButton />
+                {/* <w3m-button /> */}
+              </div>
+            </header>
+            <main className="grid flex-1 items-start gap-2 p-4 sm:px-6 sm:py-0 md:gap-4 bg-muted/40">
+              {children}
+            </main>
+          </div>
+          <Analytics />
+        </main>
+      </WagmiConfig>
     </Providers>
   );
 }
@@ -62,7 +88,7 @@ function DesktopNav() {
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-        <Link
+        {/* <Link
           href="https://vercel.com/templates/next.js/admin-dashboard-tailwind-postgres-react-nextjs"
           className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
         >
@@ -76,21 +102,21 @@ function DesktopNav() {
 
         <NavItem href="#" label="Orders">
           <ShoppingCart className="h-5 w-5" />
-        </NavItem>
+        </NavItem> */}
 
-        <NavItem href="/" label="Products">
+        <NavItem href="/" label="Pools">
           <Package className="h-5 w-5" />
         </NavItem>
 
-        <NavItem href="/customers" label="Customers">
+        {/* <NavItem href="/customers" label="Customers">
           <Users2 className="h-5 w-5" />
         </NavItem>
 
         <NavItem href="#" label="Analytics">
           <LineChart className="h-5 w-5" />
-        </NavItem>
+        </NavItem> */}
       </nav>
-      <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+      {/* <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
@@ -103,7 +129,7 @@ function DesktopNav() {
           </TooltipTrigger>
           <TooltipContent side="right">Settings</TooltipContent>
         </Tooltip>
-      </nav>
+      </nav> */}
     </aside>
   );
 }
@@ -119,7 +145,7 @@ function MobileNav() {
       </SheetTrigger>
       <SheetContent side="left" className="sm:max-w-xs">
         <nav className="grid gap-6 text-lg font-medium">
-          <Link
+          {/* <Link
             href="#"
             className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
           >
@@ -139,15 +165,15 @@ function MobileNav() {
           >
             <ShoppingCart className="h-5 w-5" />
             Orders
-          </Link>
+          </Link> */}
           <Link
             href="#"
             className="flex items-center gap-4 px-2.5 text-foreground"
           >
             <Package className="h-5 w-5" />
-            Products
+            Pools
           </Link>
-          <Link
+          {/* <Link
             href="#"
             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
           >
@@ -160,7 +186,7 @@ function MobileNav() {
           >
             <LineChart className="h-5 w-5" />
             Settings
-          </Link>
+          </Link> */}
         </nav>
       </SheetContent>
     </Sheet>
@@ -171,20 +197,20 @@ function DashboardBreadcrumb() {
   return (
     <Breadcrumb className="hidden md:flex">
       <BreadcrumbList>
-        <BreadcrumbItem>
+        {/* <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link href="#">Dashboard</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator />
+        <BreadcrumbSeparator /> */}
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="#">Products</Link>
+            <Link href="#">Pools</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbPage>All Products</BreadcrumbPage>
+          <BreadcrumbPage>All Pools</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>

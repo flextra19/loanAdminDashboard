@@ -1,7 +1,4 @@
-import 'server-only';
-
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+// import { neon } from '@neondatabase/serverless';
 import {
   pgTable,
   text,
@@ -11,62 +8,99 @@ import {
   pgEnum,
   serial
 } from 'drizzle-orm/pg-core';
-import { count, eq, ilike } from 'drizzle-orm';
-import { createInsertSchema } from 'drizzle-zod';
 
-export const db = drizzle(neon(process.env.POSTGRES_URL!));
+// export const db = drizzle(neon(process.env.POSTGRES_URL!));
 
-export const statusEnum = pgEnum('status', ['active', 'inactive', 'archived']);
+export const statusEnum = pgEnum('status', ['active', 'inactive']);
 
-export const products = pgTable('products', {
-  id: serial('id').primaryKey(),
-  imageUrl: text('image_url').notNull(),
+export const pools = pgTable('pools', {
+  address: text('address').notNull(),
   name: text('name').notNull(),
-  status: statusEnum('status').notNull(),
-  price: numeric('price', { precision: 10, scale: 2 }).notNull(),
-  stock: integer('stock').notNull(),
-  availableAt: timestamp('available_at').notNull()
+  // status: statusEnum('status').notNull(),
+  description: text('description'),
+  type: text('type').notNull(),
+  chain: text('chain').notNull(),
+  chainId: text('chainId').notNull(),
+  outstandingLoanPrincipals: text('outstandingLoanPrincipals').notNull(),
+  fixedFeeDueDate: text('fixedFeeDueDate').notNull(),
+  totalAssestsDeposited: text('totalAssestsDeposited').notNull(),
+  totalAssetsWithdrawn: text('totalAssetsWithdrawn').notNull(),
+  totalDefaults: text('totalDefaults').notNull(),
+  totalFirstLossApplied: text('totalFirstLossApplied').notNull(),
+  activatedAt: text('activatedAt').notNull(),
+  activeLoans: text('activeLoans').notNull(),
+  admin: text('admin').notNull(),
+  assetAddress: text('assetAddress').notNull(),
+  currentExpectedInterest: text('currentExpectedInterest').notNull(),
+  decimals: text('decimals').notNull(),
+  liquidityPoolAssets: text('liquidityPoolAssets').notNull(),
+  feeVault: text('feeVault').notNull(),
+  firstLossVault: text('firstLossVault').notNull(),
+  numActiveLoans: text('numActiveLoans').notNull(),
+  poolController: text('poolController').notNull(),
+  serviceConfiguration: text('serviceConfiguration').notNull(),
+  maxCapacity: text('maxCapacity').notNull(),
+  endDate: text('endDate').notNull(),
+  requestFeeBps: text('requestFeeBps').notNull(),
+  requestCancellationFeeBps: text('requestCancellationFeeBps').notNull(),
+  withdrawGateBps: text('withdrawGateBps').notNull(),
+  serviceFeeBps: text('serviceFeeBps').notNull(),
+  firstLossInitialMinimum: text('firstLossInitialMinimum').notNull(),
+  withdrawRequestPeriodDuration: text('withdrawRequestPeriodDuration').notNull(),
+  fixedFee: text('fixedFee').notNull(),
+  fixedFeeInterval: text('fixedFeeInterval').notNull(),
+  state: text('state').notNull(),
+  symbol: text('symbol').notNull(),
+  totalAssets: text('totalAssets').notNull(),
+  totalAvailableAssets: text('totalAvailableAssets').notNull(),
+  totalAvailableSupply: text('totalAvailableSupply').notNull(),
+  totalSupply: text('totalSupply').notNull(),
+  withdrawController: text('withdrawController').notNull(),
+  asset: text('asset').notNull(),
+  hasFunded: text('hasFunded').notNull(),
 });
 
-export type SelectProduct = typeof products.$inferSelect;
-export const insertProductSchema = createInsertSchema(products);
+export type SelectPool = typeof pools.$inferSelect;
 
-export async function getProducts(
-  search: string,
-  offset: number
+export async function getPools(
+  q: string,
+  page: number
 ): Promise<{
-  products: SelectProduct[];
-  newOffset: number | null;
-  totalProducts: number;
+  pools: SelectPool[];
+  totalPools: number;
 }> {
+  let pools:any[] = [];
+  let totalPools = 0;
+
+  const url = `https://api.svim.io/pools?mainnet=${q}&page=${page}`;
+
+  await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-API-KEY': 'OHI6RZjsgJa9x0E10wPk' // Replace 'asdf' with your actual API key
+    }
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      pools = data.pools; // Process the returned data here
+      totalPools = data.pagination.total_count;
+    })
+    .catch((error) => {
+      console.error('Error:'); // Handle any error that occurs
+    });
+
   // Always search the full table, not per page
-  if (search) {
-    return {
-      products: await db
-        .select()
-        .from(products)
-        .where(ilike(products.name, `%${search}%`))
-        .limit(1000),
-      newOffset: null,
-      totalProducts: 0
-    };
-  }
+  // if (search) {
+  //   return {
+  //     pools: await db
+  //       .select()
+  //       .from(pools)
+  //       .where(ilike(pools.name, `%${search}%`))
+  //       .limit(1000),
+  //     newOffset: null,
+  //     totalPools: 0
+  //   };
+  // }
 
-  if (offset === null) {
-    return { products: [], newOffset: null, totalProducts: 0 };
-  }
-
-  let totalProducts = await db.select({ count: count() }).from(products);
-  let moreProducts = await db.select().from(products).limit(5).offset(offset);
-  let newOffset = moreProducts.length >= 5 ? offset + 5 : null;
-
-  return {
-    products: moreProducts,
-    newOffset,
-    totalProducts: totalProducts[0].count
-  };
-}
-
-export async function deleteProductById(id: number) {
-  await db.delete(products).where(eq(products.id, id));
+    return { pools: pools, totalPools: totalPools };
 }

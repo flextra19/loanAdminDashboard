@@ -18,6 +18,10 @@ export default {
       }
     },
     extend: {
+      width: {'80vw' : '80vw'},
+      height: {
+        '30px': '30px',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
