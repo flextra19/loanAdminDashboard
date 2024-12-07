@@ -104,3 +104,110 @@ export async function getPools(
 
     return { pools: pools, totalPools: totalPools };
 }
+
+export async function getPoolInfo(
+  address: string,
+  chainId: string
+): Promise<{
+  res: SelectPool
+}> {
+  let res : any;
+
+  const url = `https://api.svim.io/pool/${chainId}/${address}`;
+
+  await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-API-KEY': 'OHI6RZjsgJa9x0E10wPk' // Replace 'asdf' with your actual API key
+    }
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      res = data;
+      console.log("res", res)
+    })
+    .catch((error) => {
+      console.error('Error:'); // Handle any error that occurs
+    });
+
+  // Always search the full table, not per page
+  // if (search) {
+  //   return {
+  //     pools: await db
+  //       .select()
+  //       .from(pools)
+  //       .where(ilike(pools.name, `%${search}%`))
+  //       .limit(1000),
+  //     newOffset: null,
+  //     totalPools: 0
+  //   };
+  // }
+
+    return { res: res };
+}
+
+export type LoanInfo = {
+  address: string;
+  chain_id: string;
+  loan_type: string;
+  principal: string;
+  apr: string;
+  duration: string;
+  payment_period: string;
+  drop_dead_timestamp: string;
+  late_payment: string;
+  origination_bps: string;
+  borrower: string;
+  created_at: string;
+  liquidity_asset: string;
+  outstanding_principal: string;
+  payment: string;
+  payment_due_date: string;
+  payments_remaining: string;
+  state: string;
+  collateral_vault: string;
+  funding_vault: string;
+  pool: string;
+  fungible_collateral: string;
+};
+
+export async function getPoolLoans(
+  address: string,
+  chainId: string
+): Promise<{
+  loans: LoanInfo[];
+}> {
+  let loans:any[] = [];
+
+  const url = `https://api.svim.io/pool/${chainId}/${address}/loans`;
+
+  await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-API-KEY': 'OHI6RZjsgJa9x0E10wPk' // Replace 'asdf' with your actual API key
+    }
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      loans = data;
+    })
+    .catch((error) => {
+      console.error('Error:'); // Handle any error that occurs
+    });
+
+  // Always search the full table, not per page
+  // if (search) {
+  //   return {
+  //     pools: await db
+  //       .select()
+  //       .from(pools)
+  //       .where(ilike(pools.name, `%${search}%`))
+  //       .limit(1000),
+  //     newOffset: null,
+  //     totalPools: 0
+  //   };
+  // }
+
+    return { loans: loans };
+}
+

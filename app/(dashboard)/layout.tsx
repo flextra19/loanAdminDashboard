@@ -205,13 +205,13 @@ function DashboardBreadcrumb() {
         <BreadcrumbSeparator /> */}
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="#">Pools</Link>
+            <Link href="/">Pools</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
-        <BreadcrumbItem>
+        {/* <BreadcrumbItem>
           <BreadcrumbPage>All Pools</BreadcrumbPage>
-        </BreadcrumbItem>
+        </BreadcrumbItem> */}
       </BreadcrumbList>
     </Breadcrumb>
   );

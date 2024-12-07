@@ -63,15 +63,17 @@ export function PoolsTable({
     router.push(`/?page=${Number(page) + 1}&q=${q}`, { scroll: false });
   }
 
-  function openModal(pool: SelectPool) {
-    setSelectedPool(pool);
-    setModalOpen(true);
+  function handlePoolClicked(pool: SelectPool) {
+    let params = new URLSearchParams({ address: pool.address, chainId: pool.chainId});
+    router.push(`/?${params.toString()}`);
+    // setSelectedPool(pool);
+    // setModalOpen(true);
   }
 
-  function closeModal() {
-    setSelectedPool(null);
-    setModalOpen(false);
-  }
+  // function closeModal() {
+    // setSelectedPool(null);
+    // setModalOpen(false);
+  // }
 
   return (
     <>
@@ -135,7 +137,7 @@ export function PoolsTable({
           </TableHeader>
           <TableBody>
             {pools.map((pool, index) => (
-              <Pool key={index} pool={pool} onClick={() => openModal(pool)}/>
+              <Pool key={index} pool={pool} onClick={() => handlePoolClicked(pool)}/>
             ))}
           </TableBody>
         </Table>
@@ -174,7 +176,7 @@ export function PoolsTable({
         </form>
       </CardFooter>
     </Card>
-    {isModalOpen && selectedPool && (
+    {/* {isModalOpen && selectedPool && (
       <Modal open={isModalOpen} onClose={closeModal}>
         <Box sx={style}>
         <h2 className="text-lg font-bold">Pool Details</h2>
@@ -221,10 +223,9 @@ export function PoolsTable({
         <p><strong>withdrawController:</strong><br /> {selectedPool.withdrawController}</p>
         <p><strong>asset:</strong><br /> {selectedPool.asset}</p>
         <p><strong>hasFunded:</strong><br /> {selectedPool.hasFunded}</p>
-        {/* Add more pool details here */}
         </Box>
       </Modal>
-    )}
+    )} */}
     </>
   );
 }

@@ -11,7 +11,7 @@ export function SearchInput() {
     let params = new URLSearchParams({ q: (!isChecked).toString() });
     setIsChecked(prev => !prev);
     startTransition(() => {
-      router.replace(`/?${params.toString()}`);
+      router.push(`/?${params.toString()}`);
     });
   }
 
